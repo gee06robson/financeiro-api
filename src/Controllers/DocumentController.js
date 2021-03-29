@@ -1,11 +1,13 @@
 const Document = require('../Models/Document')
 const Creditor = require('../Models/Creditor')
+const Unity = require('../Models/Unity')
 
 module.exports = {
   async index(req, res) {
     const documents = await Document.findAll({
       include: [
-        { model: Creditor, as: 'creditor'}
+        { model: Creditor, as: 'creditor'},
+        { model: Unity, as: 'units'}
       ] 
     })
 
@@ -20,8 +22,17 @@ module.exports = {
       value,
       description,
       code,
-      reason
+      reason,
+      code_unity
     } = req.body
+
+    const checkUnity = await Unity.findOne({
+      where: {
+        code_unity
+      }
+    })
+
+    if (!checkUnity) { return res.status(400).json({ error: 'Código da unidade inexistente' }) }
 
     const [creditor] = await Creditor.findOrCreate({
       where: {
@@ -45,7 +56,10 @@ module.exports = {
       }
     })
 
+
     if(!created) { return res.status(400).json({ error: 'O documento que voçê esta tentando incluir já faz parte do banco de dados.' }) }
+
+    await checkUnity.addDocument(document)
 
     return res.json(document)
   }

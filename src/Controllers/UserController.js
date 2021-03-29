@@ -1,17 +1,47 @@
 const User = require('../Models/User')
+const Unity = require('../Models/Unity')
 const Hash = require('../Auth/hash')
 const Token = require('../Auth/token.auth')
+const Role = require('../Models/Role')
 const { LOGIN_EXPIRATION_TIME } = require('../Auth/settings')
 
 
 module.exports = {
+  async index(req, res) {
+    const users = await User.findAll({
+      attributes: ['id', 'name', 'last_name', 'code', 'email', 'code_user', 'status'],
+      include: [
+        { model: Unity, 
+          as: 'units', 
+          attributes: ['id', 'unity', 'code_unity', 'records', 'status'], 
+          through: { 
+            attributes: [] 
+          } 
+        },
+        { model: Role,  
+          as: 'roles', 
+          attributes: ['id', 'role', 'description'], 
+          through: { 
+            attributes: [] 
+          } 
+        }
+      ]
+    })
+
+    return res.json(users)
+  },
+
   async login(req, res) {
     const { code, password } = req.body
 
     const user = await User.findOne({
       where: {
         code
-      }
+      },
+      include: [
+        { model: Unity, as: 'units'},
+        { model: Role,  as: 'roles', attributes: ['id', 'role'], through: { attributes: [] } }
+      ]
     })
 
     if (!user) { return res.status(400).json({ error: 'Erro ao efetuart login' })}
@@ -22,9 +52,10 @@ module.exports = {
     const JWTData = {
       iss: 'api-financeiro',
       sub: user.id,
-      name: 'Financeiro',
-      admin: true,
-      exp: Math.floor(Date.now() / 1000) + LOGIN_EXPIRATION_TIME
+      name: [user.name, user.last_name],
+      roles: user.roles,
+      exp: Math.floor(Date.now() / 1000) + LOGIN_EXPIRATION_TIME,
+      iat: Math.floor(Date.now() / 1000)
     }
 
     const token = await Token.generate(JWTData)
@@ -33,6 +64,16 @@ module.exports = {
   },
 
   async store(req, res) {
+    const { code_unity } = req.body
+
+    const checkUnity = await Unity.findOne({
+      where: {
+        code_unity
+      }
+    })
+
+    if (!checkUnity) { return res.status(400).json({ error: 'Código da unidade inexistente' }) }
+
     try {
 
       const { name, last_name, code, email } = req.body
@@ -52,8 +93,10 @@ module.exports = {
         }
       })
   
+      await checkUnity.addUser(newUser)
       if (!created) { return res.status(400).json({ error: 'Usuário já registrado'}) }
-      
+
+
       return res.json(newUser)
       
     } catch (error) {

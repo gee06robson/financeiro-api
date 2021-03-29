@@ -2,25 +2,26 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('auxiliary_documents', { 
+    return queryInterface.createTable('users_roles', { 
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
-      type: {
-        type: Sequelize.STRING,
+      id_user: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: { model: 'users', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-      number: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      value: {
-        type: Sequelize.DECIMAL(10, 2),
-        defaultValue: 0.00,
+      id_role: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: { model: 'roles', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       created_at: {
         type: Sequelize.DATE,
@@ -29,11 +30,11 @@ module.exports = {
       updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
-      },
+      }, 
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('auxiliary_documents');
+    return queryInterface.dropTable('users_roles');
   }
 };

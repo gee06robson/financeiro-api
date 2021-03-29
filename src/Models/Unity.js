@@ -25,7 +25,8 @@ class Unity extends Model {
   }
 
   static associate(models) {
-    this.hasMany(models.List, { foreignKey: 'id_unity',  as: 'lists' })
+    this.belongsToMany(models.User, { foreignKey: 'id_unity', through: 'unity_user', as: 'users' })
+    this.belongsToMany(models.Documents, { foreignKey: 'id_unity', through: 'unity_document', as: 'documents' })
   }
 }
 

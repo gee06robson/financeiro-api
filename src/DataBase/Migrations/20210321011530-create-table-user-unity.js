@@ -2,42 +2,26 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('lists', { 
+    return queryInterface.createTable('unity_user', { 
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
-      code_list: {
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-      },
-      type: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      number: {
+      id_user: {
         type: Sequelize.INTEGER,
-        defaultValue: 0,
         allowNull: false,
+        references: { model: 'users', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       id_unity: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: 'units', key: 'id' },
         onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT',
-      },
-      status: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-        allowNull: false,
-      },
-      description: {
-        type: Sequelize.STRING,
-        allowNull: false,
+        onDelete: 'CASCADE',
       },
       created_at: {
         type: Sequelize.DATE,
@@ -51,6 +35,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('lists');
+      return queryInterface.dropTable('unity_user');
   }
 };

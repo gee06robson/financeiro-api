@@ -1,8 +1,16 @@
 const Unity = require('../Models/Unity')
+const User = require('../Models/User')
+const Creditor = require('../Models/Creditor')
 
 module.exports = {
   async index(req, res  ) {
-    const units = await Unity.findAll()
+    const units = await Unity.findAll({
+      include: [
+        { model: User, as: 'users' },
+        { association: 'documents', 
+        include: [{ model: Creditor, as: 'creditor'}]}
+      ]
+    })
 
     return res.json(units)
   },

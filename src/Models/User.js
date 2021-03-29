@@ -1,13 +1,11 @@
 const { DataTypes, Model } = require('sequelize')
-const bcrypt = require('bcrypt')
 
 class User extends Model {
   static init(sequelize) {
     super.init({
-      id: {
+      code_user: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
       },
       name: {
         type: DataTypes.STRING,
@@ -65,6 +63,11 @@ class User extends Model {
       sequelize,
       tableName: 'users',
     })
+  }
+
+  static associate(models) {
+    this.belongsToMany(models.Unity, { foreignKey: 'id_user', through: 'unity_user', as: 'units' })
+    this.belongsToMany(models.Role, { foreignKey: 'id_user', through: 'users_roles', as: 'roles' })
   }
 }
 
