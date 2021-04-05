@@ -18,6 +18,7 @@ class Documents extends Model {
    static associate(models) {
     this.belongsTo(models.Creditors, { foreignKey: 'creditor_id',  through: 'documents', as: 'creditor' })
     this.belongsToMany(models.Unity, { foreignKey: 'id_document', through: 'unity_document', as: 'units' })
+    this.belongsToMany(models.User, { foreignKey: 'id_document', through: 'user_document', as: 'users' })
    }
 }
 

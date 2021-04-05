@@ -68,6 +68,7 @@ class User extends Model {
   static associate(models) {
     this.belongsToMany(models.Unity, { foreignKey: 'id_user', through: 'unity_user', as: 'units' })
     this.belongsToMany(models.Role, { foreignKey: 'id_user', through: 'users_roles', as: 'roles' })
+    this.belongsToMany(models.Documents, { foreignKey: 'id_user', through: 'user_document', as: 'users' })
   }
 }
 

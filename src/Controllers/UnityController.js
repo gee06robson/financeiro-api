@@ -15,6 +15,12 @@ module.exports = {
     return res.json(units)
   },
 
+  async all(req, res  ) {
+    const units = await Unity.findAll()
+
+    return res.json(units)
+  },
+
   async store(req, res) {
     const { unity } = req.body
 

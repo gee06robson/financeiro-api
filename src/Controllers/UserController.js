@@ -11,14 +11,16 @@ module.exports = {
     const users = await User.findAll({
       attributes: ['id', 'name', 'last_name', 'code', 'email', 'code_user', 'status'],
       include: [
-        { model: Unity, 
+        { 
+          model: Unity, 
           as: 'units', 
           attributes: ['id', 'unity', 'code_unity', 'records', 'status'], 
           through: { 
             attributes: [] 
           } 
         },
-        { model: Role,  
+        { 
+          model: Role,  
           as: 'roles', 
           attributes: ['id', 'role', 'description'], 
           through: { 
@@ -32,17 +34,35 @@ module.exports = {
   },
 
   async login(req, res) {
-    const { code, password } = req.body
+    const { code, password, unity } = req.body
 
     const user = await User.findOne({
       where: {
         code
       },
       include: [
-        { model: Unity, as: 'units'},
-        { model: Role,  as: 'roles', attributes: ['id', 'role'], through: { attributes: [] } }
+        { 
+          model: Unity, 
+          as: 'units', 
+          attributes: ['unity', 'code_unity'], 
+          through: { 
+            attributes: [] 
+          }, 
+          where: {
+            code_unity: unity.value
+          }
+        },
+        { 
+          model: Role,  
+          as: 'roles', 
+          attributes: ['id', 'role'], 
+          through: { 
+            attributes: [] 
+          } 
+        }
       ]
     })
+
 
     if (!user) { return res.status(400).json({ error: 'Erro ao efetuart login' })}
 
@@ -51,8 +71,15 @@ module.exports = {
 
     const JWTData = {
       iss: 'api-financeiro',
-      sub: user.id,
-      name: [user.name, user.last_name],
+      sub: [{
+        name: user.name, 
+        lastName: user.last_name, 
+        codeUser: user.code_user
+      }],
+      unity: [{
+        unity: user.units[0].unity, 
+        codeUnity: user.units[0].code_unity
+      }],
       roles: user.roles,
       exp: Math.floor(Date.now() / 1000) + LOGIN_EXPIRATION_TIME,
       iat: Math.floor(Date.now() / 1000)

@@ -1,20 +1,27 @@
 const Document = require('../Models/Document')
 const Creditor = require('../Models/Creditor')
 const Unity = require('../Models/Unity')
+const User = require('../Models/User')
+const Token = require('../Auth/token.auth')
 
 module.exports = {
   async index(req, res) {
+
     const documents = await Document.findAll({
       include: [
-        { model: Creditor, as: 'creditor'},
-        { model: Unity, as: 'units'}
-      ] 
+        { model: Creditor, as: 'creditor', attributes: ['code', 'reason']},
+        { model: Unity, as: 'units', attributes: ['code_unity', 'unity'], through: { attributes: [],  }},
+        { model: User, as: 'users', attributes: ['name', 'last_name', 'code'], through: { attributes: [] }}
+      ]
     })
 
     return res.json(documents)
   },
 
   async store(req, res) {
+    const { authorization } = req.headers
+    const { unity } = await Token.check(authorization)
+    console.log(unity)
     const {
       number,
       emission,
@@ -23,7 +30,8 @@ module.exports = {
       description,
       code,
       reason,
-      code_unity
+      code_unity,
+      code_user
     } = req.body
 
     const checkUnity = await Unity.findOne({
@@ -33,6 +41,14 @@ module.exports = {
     })
 
     if (!checkUnity) { return res.status(400).json({ error: 'Código da unidade inexistente' }) }
+
+    const checkUser = await User.findOne({
+      where: {
+        code_user
+      }
+    })
+
+    if (!checkUser) { return res.status(400).json({ error: 'User not found' }) }
 
     const [creditor] = await Creditor.findOrCreate({
       where: {
@@ -60,6 +76,7 @@ module.exports = {
     if(!created) { return res.status(400).json({ error: 'O documento que voçê esta tentando incluir já faz parte do banco de dados.' }) }
 
     await checkUnity.addDocument(document)
+    await checkUser.addUsers(document)
 
     return res.json(document)
   }

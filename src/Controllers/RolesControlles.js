@@ -5,7 +5,7 @@ module.exports = {
   async index(req, res) {
     const roles = await Role.findAll({
       include: [
-        { model: User, as: 'users' },
+        { model: User, as: 'users', attributes: ['name', 'last_name', 'code_user'], through: { attributes: [] } },
       ]
     })
 

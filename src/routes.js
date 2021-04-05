@@ -10,26 +10,30 @@ const Role = require('./Controllers/RolesControlles')
 
 const routes = express.Router()
 
-routes.get('/users', middleware, User.index)
-routes.post('/user', User.store)
 routes.post('/login', User.login)
+routes.get('/allunits', Unity.all)
 
-routes.post('/creditor', middleware, Creditor.store)
+routes.use(middleware)
+
+routes.get('/users', User.index)
+routes.post('/user', User.store)
+
+routes.post('/creditor', Creditor.store)
 routes.post('/one_creditor', Creditor.one)
 routes.post('/update', Creditor.update)
-routes.get('/creditor', middleware, Creditor.index)
+routes.get('/creditor', Creditor.index)
 
 routes.post('/document', Document.store)
-routes.get('/document', middleware,Document.index)
+routes.get('/document', Document.index)
 
 routes.post('/unity', Unity.store)
 routes.get('/unity', Unity.index)
 
 routes.get('/blacklist', BlackList.index)
-routes.post('/blacklist', middleware, BlackList.store)
-routes.get('/check', middleware, BlackList.check)
+routes.post('/blacklist', BlackList.store)
+routes.get('/check', BlackList.check)
 
-routes.get('/roles', middleware, Role.index)
+routes.get('/roles', Role.index)
 routes.post('/newrole', Role.store)
 routes.post('/addrole', Role.addRoles)
 
