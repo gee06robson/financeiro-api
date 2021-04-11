@@ -6,12 +6,35 @@ const Token = require('../Auth/token.auth')
 
 module.exports = {
   async index(req, res) {
+    const { code_unity } = req.params
 
+    console.log(code_unity)
     const documents = await Document.findAll({
       include: [
-        { model: Creditor, as: 'creditor', attributes: ['code', 'reason']},
-        { model: Unity, as: 'units', attributes: ['code_unity', 'unity'], through: { attributes: [],  }},
-        { model: User, as: 'users', attributes: ['name', 'last_name', 'code'], through: { attributes: [] }}
+        { 
+          model: Creditor, 
+          as: 'creditor', 
+          attributes: ['code', 'reason']
+        },
+        { 
+          model: Unity, 
+          as: 'units', 
+          attributes: ['code_unity', 'unity'], 
+          through: { 
+            attributes: [],  
+          }, 
+          where: { 
+            code_unity 
+          }
+        },
+        { 
+          model: User, 
+          as: 'users', 
+          attributes: ['name', 'last_name', 'code'], 
+          through: { 
+            attributes: [] 
+          }
+        }
       ]
     })
 
@@ -40,7 +63,11 @@ module.exports = {
       }
     })
 
-    if (!checkUnity) { return res.status(400).json({ error: 'Código da unidade inexistente' }) }
+    if (!checkUnity) { 
+      return res.status(400).json({ 
+        error: 'Código da unidade inexistente' 
+      }) 
+    }
 
     const checkUser = await User.findOne({
       where: {
@@ -48,7 +75,11 @@ module.exports = {
       }
     })
 
-    if (!checkUser) { return res.status(400).json({ error: 'User not found' }) }
+    if (!checkUser) { 
+      return res.status(400).json({ 
+        error: 'User not found' 
+      }) 
+    }
 
     const [creditor] = await Creditor.findOrCreate({
       where: {
@@ -73,7 +104,11 @@ module.exports = {
     })
 
 
-    if(!created) { return res.status(400).json({ error: 'O documento que voçê esta tentando incluir já faz parte do banco de dados.' }) }
+    if(!created) { 
+      return res.status(400).json({ 
+        error: 'O documento que voçê esta tentando incluir já faz parte do banco de dados.' 
+      }) 
+    }
 
     await checkUnity.addDocument(document)
     await checkUser.addUsers(document)

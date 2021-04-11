@@ -24,7 +24,7 @@ routes.post('/update', Creditor.update)
 routes.get('/creditor', Creditor.index)
 
 routes.post('/document', Document.store)
-routes.get('/document', Document.index)
+routes.get('/document/:code_unity', Document.index)
 
 routes.post('/unity', Unity.store)
 routes.get('/unity', Unity.index)

@@ -8,7 +8,7 @@ const Documents = require('../Models/Document')
 const BlackList = require('../Models/BlackList')
 const Role = require('../Models/Role')
 
-const connection = new Sequelize(process.env.DATABASE_URL, dbConfig)
+const connection = new Sequelize(process.env.DATABASE_URL || '', dbConfig.production)
 
 Users.init(connection)
 Unity.init(connection)
