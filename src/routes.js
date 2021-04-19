@@ -12,6 +12,7 @@ const routes = express.Router()
 
 routes.post('/login', User.login)
 routes.get('/allunits', Unity.all)
+routes.post('/teste', User.teste)
 
 routes.use(middleware)
 

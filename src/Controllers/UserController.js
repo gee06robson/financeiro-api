@@ -129,5 +129,9 @@ module.exports = {
     } catch (error) {
       return res.json(error)
     }
+  },
+
+  async teste(req, res) {
+    console.log(req.body)
   }
 }
