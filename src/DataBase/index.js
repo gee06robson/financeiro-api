@@ -7,6 +7,8 @@ const Creditors = require('../Models/Creditor')
 const Documents = require('../Models/Document')
 const BlackList = require('../Models/BlackList')
 const Role = require('../Models/Role')
+const Taxes = require('../Models/Taxes')
+const taxesDocuments = require('../Models/taxes_documents')
 
 const connection = new Sequelize(process.env.DATABASE_URL, dbConfig.production)
 
@@ -16,12 +18,15 @@ Creditors.init(connection)
 Documents.init(connection)
 BlackList.init(connection)
 Role.init(connection)
+Taxes.init(connection)
+taxesDocuments.init(connection)
 
 Creditors.associate(connection.models)
 Documents.associate(connection.models)
 Unity.associate(connection.models)
 Users.associate(connection.models)
 Role.associate(connection.models)
+Taxes.associate(connection.models)
 
 
 module.exports = connection;

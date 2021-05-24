@@ -2,13 +2,12 @@ const Document = require('../Models/Document')
 const Creditor = require('../Models/Creditor')
 const Unity = require('../Models/Unity')
 const User = require('../Models/User')
-const Token = require('../Auth/token.auth')
+const Taxes = require('../Models/Taxes')
 
 module.exports = {
   async index(req, res) {
     const { code_unity } = req.params
 
-    console.log(code_unity)
     const documents = await Document.findAll({
       include: [
         { 
@@ -34,6 +33,14 @@ module.exports = {
           through: { 
             attributes: [] 
           }
+        },
+        {
+          model: Taxes,
+          as: 'retentions',
+          attributes: ['code', 'percentage'],
+          through: {
+            attributes: ['calculation']
+          }
         }
       ]
     })
@@ -41,10 +48,55 @@ module.exports = {
     return res.json(documents)
   },
 
+  async one(req, res) {
+    const { code_unity, id } = req.body
+
+    const documents = await Document.findOne({
+      where: {
+        id
+      },
+      include: [
+        { 
+          model: Creditor, 
+          as: 'creditor', 
+          attributes: ['id', 'code', 'reason']
+        },
+        { 
+          model: Unity, 
+          as: 'units', 
+          attributes: ['code_unity', 'unity'], 
+          through: { 
+            attributes: [],  
+          }, 
+          where: { 
+            code_unity 
+          }
+        },
+        { 
+          model: User, 
+          as: 'users', 
+          attributes: ['name', 'last_name', 'code'], 
+          through: { 
+            attributes: [] 
+          }
+        },
+        {
+          model: Taxes,
+          as: 'retentions',
+          attributes: ['id', 'code', 'percentage'],
+          through: {
+            attributes: ['calculation']
+          }
+        }
+      ]
+    })
+
+    if (!documents) { return res.status(400).json({ error: 'Error 400 -- Document not found' }) }
+
+    return res.json(documents)
+  },
+
   async store(req, res) {
-    const { authorization } = req.headers
-    const { unity } = await Token.check(authorization)
-    console.log(unity)
     const {
       number,
       emission,
@@ -95,11 +147,11 @@ module.exports = {
         creditor_id: creditor.id,
         number,
         emission,
-        due,
         value,
       },
       defaults: {
-        description
+        description,
+        due
       }
     })
 
@@ -114,5 +166,41 @@ module.exports = {
     await checkUser.addUsers(document)
 
     return res.json(document)
+  },
+
+  async update(req, res) {
+    const {
+      id,
+      number,
+      emission,
+      due,
+      value,
+      description,
+    } = req.body
+
+    const document = await Document.findByPk(id)
+
+          document.number      = number
+          document.emission    = emission
+          document.due         = due
+          document.value       = value
+          document.description = description
+    
+    await document.save()
+    await document.reload()
+    
+    return res.json(document)
+  },
+
+  async delete(req, res) {
+    const { id } = req.body
+
+    const document = await Document.findByPk(id)
+
+    if (!document) return res.status(400).json({ error: 'Document not found' })
+
+    await document.destroy()
+
+    return res.status(200).json({ success: 'Document deleted' })
   }
 }
