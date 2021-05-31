@@ -3,6 +3,7 @@ const Creditor = require('../Models/Creditor')
 const Unity = require('../Models/Unity')
 const User = require('../Models/User')
 const Taxes = require('../Models/Taxes')
+const List = require('../Models/List')
 
 module.exports = {
   async index(req, res) {
@@ -106,8 +107,10 @@ module.exports = {
       code,
       reason,
       code_unity,
-      code_user
+      code_user,
     } = req.body
+
+    const { code_list } = req.params
 
     const checkUnity = await Unity.findOne({
       where: {
@@ -160,6 +163,21 @@ module.exports = {
       return res.status(400).json({ 
         error: 'O documento que voçê esta tentando incluir já faz parte do banco de dados.' 
       }) 
+    }
+
+    if (code_list!=="undefined") {
+      const checkList = await List.findOne({
+        where: {
+          code_list
+        }
+      })
+  
+      if (!checkList) 
+        return res.status(400).json({ 
+          error: 'associação negada: lista informada não existe' 
+        }) 
+
+      await checkList.addDocuments(document)
     }
 
     await checkUnity.addDocument(document)

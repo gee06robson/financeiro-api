@@ -1,6 +1,7 @@
 const Unity = require('../Models/Unity')
 const User = require('../Models/User')
 const Creditor = require('../Models/Creditor')
+const List = require('../Models/List')
 
 module.exports = {
   async index(req, res  ) {
@@ -8,7 +9,8 @@ module.exports = {
       include: [
         { model: User, as: 'users' },
         { association: 'documents', 
-        include: [{ model: Creditor, as: 'creditor'}]}
+        include: [{ model: Creditor, as: 'creditor'}]},
+        { model: List, as: 'lists'},
       ]
     })
 

@@ -7,7 +7,7 @@ class Documents extends Model {
       emission: DataTypes.STRING,
       due: DataTypes.STRING,
       value: DataTypes.DECIMAL(10, 2),
-      status: DataTypes.STRING,
+      status: DataTypes.BOOLEAN,
       description: DataTypes.STRING,
     }, {
       sequelize,
@@ -20,6 +20,7 @@ class Documents extends Model {
     this.belongsToMany(models.Unity, { foreignKey: 'id_document', through: 'unity_document', as: 'units' })
     this.belongsToMany(models.User, { foreignKey: 'id_document', through: 'user_document', as: 'users' })
     this.belongsToMany(models.Taxes, { foreignKey: 'id_document', through: 'taxes_documents', as: 'retentions'  })
+    this.belongsToMany(models.List, { foreignKey: 'id_document', through: 'list_documents', as: 'lists'  })
    }
 }
 

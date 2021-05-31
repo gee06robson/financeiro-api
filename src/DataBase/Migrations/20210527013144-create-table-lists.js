@@ -2,35 +2,31 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('documents', { 
+    return queryInterface.createTable('lists', { 
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
-      creditor_id: {
-        type: Sequelize.INTEGER,
+      code_list: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         allowNull: false,
-        references: { model: 'creditors', key: 'id' },
-        onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT',
       },
-      number: {
+      linked_to: {
         type: Sequelize.STRING,
+        defaultValue: "",
         allowNull: false,
       },
-      emission: {
+      title: {
         type: Sequelize.STRING,
+        defaultValue: "Entrega de documentos ao setor financeiro",
         allowNull: false,
       },
-      due: {
+      description: {
         type: Sequelize.STRING,
-        allowNull: false,
-      },
-      value: {
-        type: Sequelize.DECIMAL(10, 2),
-        defaultValue: 0.00,
+        defaultValue: "Relatório contendo documentos para liquidação e pagamento",
         allowNull: false,
       },
       status: {
@@ -38,10 +34,12 @@ module.exports = {
         defaultValue: false,
         allowNull: false,
       },
-      description: {
-        type: Sequelize.TEXT,
-        defaultValue: "",
+      unity_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: { model: 'units', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT',
       },
       created_at: {
         type: Sequelize.DATE,
@@ -55,6 +53,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('documents');
+    return queryInterface.dropTable('lists');
   }
 };

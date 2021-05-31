@@ -8,6 +8,7 @@ const middleware = require('./Auth/middleware')
 const BlackList = require('./Controllers/BlackListController')
 const Role = require('./Controllers/RolesControlles')
 const Taxes = require('./Controllers/TaxesController')
+const List = require('./Controllers/ListController')
 
 const routes = express.Router()
 
@@ -25,7 +26,7 @@ routes.post('/one_creditor', Creditor.one)
 routes.post('/update', Creditor.update)
 routes.get('/creditor', Creditor.index)
 
-routes.post('/document', Document.store)
+routes.post('/document/:code_list', Document.store)
 routes.get('/document/:code_unity', Document.index)
 routes.post('/update_document', Document.one)
 routes.post('/edit_document', Document.update)
@@ -47,6 +48,11 @@ routes.post('/addnewtax', Taxes.store)
 routes.post('/updatetax', Taxes.update)
 routes.post('/apply_tax', Taxes.applyTax)
 routes.delete('/delete_taxes/:id_document/:id_retention', Taxes.delete)
+
+routes.get('/lists/:code_unity', List.index)
+routes.get('/one_list/:code_unity/:code_list', List.one)
+routes.post('/newlist', List.store)
+routes.post('/add_document', List.addDocument)
 
 
 module.exports = routes
