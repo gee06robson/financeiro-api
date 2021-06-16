@@ -91,11 +91,11 @@ module.exports = {
   },
 
   async store(req, res) {
-    const { code_unity } = req.body
+    const { unity } = req.body
 
     const checkUnity = await Unity.findOne({
       where: {
-        code_unity
+        code_unity: unity.value
       }
     })
 
@@ -120,10 +120,9 @@ module.exports = {
         }
       })
   
-      await checkUnity.addUser(newUser)
       if (!created) { return res.status(400).json({ error: 'Usuário já registrado'}) }
-
-
+      await checkUnity.addUser(newUser)
+      
       return res.json(newUser)
       
     } catch (error) {

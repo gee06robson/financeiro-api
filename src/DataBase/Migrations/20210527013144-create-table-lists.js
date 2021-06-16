@@ -41,6 +41,16 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT',
       },
+      authentication: {
+        type: Sequelize.STRING,
+        defaultValue: "",
+        allowNull: false,
+      },
+      occupation: {
+        type: Sequelize.STRING,
+        defaultValue: "",
+        allowNull: false,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

@@ -4,17 +4,26 @@ const Unity = require('../Models/Unity')
 const User = require('../Models/User')
 const Taxes = require('../Models/Taxes')
 const List = require('../Models/List')
+const DocumentsSIAFI = require('../Models/DocumentsSIAFI')
 
 module.exports = {
   async index(req, res) {
     const { code_unity } = req.params
 
     const documents = await Document.findAll({
+      order: [
+        ['createdAt', 'DESC'],
+      ],
       include: [
         { 
           model: Creditor, 
           as: 'creditor', 
           attributes: ['code', 'reason']
+        },
+        { 
+          model: List, 
+          as: 'lists', 
+          attributes: ['code_list']
         },
         { 
           model: Unity, 
@@ -41,6 +50,14 @@ module.exports = {
           attributes: ['code', 'percentage'],
           through: {
             attributes: ['calculation']
+          }
+        },
+        {
+          model: DocumentsSIAFI,
+          as: 'documents_SIAFI',
+          attributes: ['year', 'document', 'number'],
+          through: {
+            attributes: []
           }
         }
       ]
@@ -87,6 +104,14 @@ module.exports = {
           attributes: ['id', 'code', 'percentage'],
           through: {
             attributes: ['calculation']
+          }
+        },
+        {
+          model: DocumentsSIAFI,
+          as: 'documents_SIAFI',
+          attributes: ['id', 'year', 'document', 'number'],
+          through: {
+            attributes: []
           }
         }
       ]

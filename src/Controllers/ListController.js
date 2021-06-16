@@ -3,6 +3,7 @@ const Unity = require('../Models/Unity')
 const Document = require('../Models/Document')
 const Creditor = require('../Models/Creditor')
 const Taxes = require('../Models/Taxes')
+const DocumentsSIAFI = require('../Models/DocumentsSIAFI')
 
 module.exports = {
   async index(req, res) {
@@ -28,6 +29,31 @@ module.exports = {
     })
 
     if (!list) return res.status(400).json({ error: 'listas não encontradas' })
+
+    return res.json(list)
+  },
+
+  async oneReduced(req, res) {
+    const {
+      code_list, 
+      code_unity
+    } = req.params
+
+    const checkUnit = await Unity.findOne({
+      where: {
+        code_unity
+      }
+    })
+
+    if (!checkUnit) return res.status(400).json({ error: 'unidade não encontrada' })
+
+    const list = await List.findOne({
+      where: {
+        code_list
+      },
+    })
+
+    if (!list) return res.status(400).json({ error: 'lista não encontrada' })
 
     return res.json(list)
   },
@@ -75,6 +101,14 @@ module.exports = {
               through: {
                 attributes: ['calculation']
               }
+            },
+            {
+              model: DocumentsSIAFI,
+              as: 'documents_SIAFI',
+              attributes: ['year', 'document', 'number'],
+              through: {
+                attributes: []
+              }
             }
           ],
         },
@@ -113,13 +147,64 @@ module.exports = {
     return res.json(newList)
   },
 
+  async update(req, res) {
+    const { 
+      linked_to,
+      title,
+      description,
+      authentication,
+      occupation
+    } = req.body
+
+    const {
+      code_list, 
+      code_unity
+    } = req.params
+
+    const checkList = await List.findOne({
+      where: {
+        code_list
+      }
+    })
+
+    if (!checkList) return res.status(400).json({ 
+      error: 'lista não encontrada' 
+    })
+
+    const checkUnit = await Unity.findOne({
+      where: {
+        code_unity
+      }
+    })
+
+    if (!checkUnit) return res.status(400).json({ 
+      error: 'unidade não encontrada' 
+    })
+
+    checkList.linked_to = linked_to
+    checkList.title = title
+    checkList.description = description
+    checkList.authentication = authentication
+    checkList.occupation = occupation
+
+    await checkList.save()
+    await checkList.reload()
+
+    return res.json(checkList)
+  },
+
   async addDocument(req, res) {
     const { 
-      id_list, 
+      code_list, 
       id_document,
       status } = req.body
     
-    const checkList = await List.findByPk(id_list)
+    const checkList = await List.findOne({
+      where: {
+        code_list
+      }
+    })
+    
     const checkDocument = await Document.findByPk(id_document)
 
     if (!checkList || !checkDocument) return res.status(400).json({ error: 'associação negada' })
@@ -131,5 +216,22 @@ module.exports = {
     })
 
     return res.json(checkDocument)
+  },
+
+  async removeDocument(req, res) {
+    const { code_list, id_document } = req.body
+
+    const checkDocument = await Document.findByPk(id_document)
+    const checkList = await List.findOne({
+      where: {
+        code_list
+      }
+    })
+    if (!checkList || !checkDocument) return res.status(400).json({ error: 'desassociação negada' })
+
+    await checkList.removeDocuments(checkDocument)
+
+    return res.status(200).json({ success: 'desassociação bem sucedida' })
+
   }
 }

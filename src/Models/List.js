@@ -18,6 +18,12 @@ class List extends Model {
       },
       status: {
         type: DataTypes.BOOLEAN
+      },
+      authentication: {
+        type: DataTypes.STRING
+      },
+      occupation: {
+        type: DataTypes.STRING
       }
     }, {
       sequelize,
