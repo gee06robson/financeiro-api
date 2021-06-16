@@ -13,7 +13,7 @@ const listsDocuments = require('../Models/list_document')
 const List = require('../Models/List')
 const DocumentsSIAFI = require('../Models/DocumentsSIAFI')
 
-const connection = new Sequelize(process.env.DATABASE_URL, dbConfig.development)
+const connection = new Sequelize(process.env.DATABASE_URL, dbConfig.production)
 
 Users.init(connection)
 Unity.init(connection)

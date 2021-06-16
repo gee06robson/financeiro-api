@@ -17,6 +17,7 @@ routes.post('/login', User.login)
 routes.get('/allunits', Unity.all)
 routes.post('/teste', User.teste)
 routes.post('/user', User.store)
+routes.post('/unity', Unity.store)
 
 routes.use(middleware)
 
@@ -33,7 +34,6 @@ routes.post('/update_document', Document.one)
 routes.post('/edit_document', Document.update)
 routes.post('/delete_document', Document.delete)
 
-routes.post('/unity', Unity.store)
 routes.get('/unity', Unity.index)
 
 routes.get('/blacklist', BlackList.index)
